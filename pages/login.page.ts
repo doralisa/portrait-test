@@ -10,12 +10,6 @@ export class LoginPage {
   readonly passwordToggle: Locator;
   readonly dashboardTitle: Locator;
   readonly logoutButton: Locator;
-  readonly navbar: Locator;
-  readonly navLogo: Locator;
-  readonly navDashboard: Locator;
-  readonly navProducts: Locator;
-  readonly navInventory: Locator;
-  readonly userName: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -26,12 +20,6 @@ export class LoginPage {
     this.passwordToggle = page.getByTestId('password-toggle');
     this.dashboardTitle = page.getByTestId('dashboard-title');
     this.logoutButton = page.getByTestId('logout-button');
-    this.navbar = page.getByTestId('navbar');
-    this.navLogo = page.getByTestId('nav-logo');
-    this.navDashboard = page.getByTestId('nav-dashboard');
-    this.navProducts = page.getByTestId('nav-products');
-    this.navInventory = page.getByTestId('nav-inventory');
-    this.userName = page.getByTestId('user-name');
   }
 
   async goto() {
