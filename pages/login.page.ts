@@ -1,5 +1,4 @@
 import { Page, Locator } from '@playwright/test';
-import { waitForElement } from '../tests/helpers/test-helpers';
 
 export class LoginPage {
   readonly page: Page;
@@ -39,7 +38,7 @@ export class LoginPage {
 
   async togglePasswordVisibility() {
     await this.emailInput.click();
-    await waitForElement(this.page, 'password-toggle');
+    await this.passwordToggle.waitFor({ state: 'visible' });
     await this.passwordToggle.click();
   }
 
