@@ -91,9 +91,15 @@ export class ProductsPage {
     await this.cancelDeleteButton.click();
   }
 
-  async isDeleteModalVisible() {
-    return await this.deleteModal.isVisible();
+  async waitForDeleteModal() {
+    await this.deleteModal.waitFor({ state: 'visible' });
   }
+
+  async waitForProduct(productId: string) {
+    const row = await this.getProductRow(productId);
+    await row.waitFor({ state: 'visible' });
+  }
+
 
   async getProductData(productId: string) {
     const row = await this.getProductRow(productId);
@@ -108,10 +114,6 @@ export class ProductsPage {
     };
   }
 
-  async isProductVisible(productId: string) {
-    const row = await this.getProductRow(productId);
-    return await row.isVisible();
-  }
 
   async deleteFirstProduct() {
     if (await this.getProductCount() > 0) {

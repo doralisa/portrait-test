@@ -46,7 +46,8 @@ export class LoginPage {
     return await this.errorMessage.textContent() || '';
   }
 
-  async isErrorMessageVisible() {
-    return await this.errorMessage.isVisible();
+  async waitForErrorMessage() {
+    await this.errorMessage.waitFor({ state: 'visible' });
   }
+
 }

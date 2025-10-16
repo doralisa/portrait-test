@@ -91,9 +91,6 @@ export class NewProductPage {
     await this.cancelButton.click();
   }
 
-  async isValidationErrorVisible(errorText: string) {
-    return await this.page.locator(`text=${errorText}`).isVisible();
-  }
 
   async getValidationErrors() {
     const errors = [];
