@@ -122,7 +122,6 @@ export class InventoryPage {
     await badge.waitFor({ state: 'visible' });
   }
 
-
   async getNewStockValue() {
     const newStockText = await this.page.locator('text=New Stock:').locator('..').textContent();
     const match = newStockText?.match(/New Stock:\s*<strong>(\d+)<\/strong>/);

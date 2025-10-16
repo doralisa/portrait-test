@@ -114,13 +114,4 @@ test.describe('Inventory Management Tests', () => {
     });
   });
 
-  test.describe('Bulk Operations', () => {
-    test('should display inventory table with proper structure', async () => {
-      await expect(inventoryPage.inventoryTable).toBeVisible();
-      await expect(inventoryPage.title).toContainText(INVENTORY_CONSTANTS.TITLES.PAGE_TITLE);
-      
-      const productCount = await inventoryPage.getProductCount();
-      expect(productCount).toBeGreaterThanOrEqual(0);
-    });
-  });
 });

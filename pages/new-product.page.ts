@@ -1,6 +1,5 @@
 import { Page, Locator } from '@playwright/test';
 import { waitForElement } from '../tests/helpers/test-helpers';
-import { PRODUCT_CONSTANTS } from '../tests/fixtures/productConstants';
 
 export interface ProductFormData {
   sku: string;
@@ -52,12 +51,12 @@ export class NewProductPage {
     this.thresholdInput = page.getByTestId('threshold-input');
     this.saveButton = page.getByTestId('save-button');
     this.cancelButton = page.getByTestId('cancel-button');
-    this.skuError = page.getByRole('paragraph').getByText(PRODUCT_CONSTANTS.ERROR_MESSAGES.SKU_REQUIRED);
-    this.nameError = page.getByRole('paragraph').getByText(PRODUCT_CONSTANTS.ERROR_MESSAGES.NAME_REQUIRED);
-    this.priceError = page.getByRole('paragraph').getByText(PRODUCT_CONSTANTS.ERROR_MESSAGES.PRICE_REQUIRED);
-    this.priceNegativeError = page.getByRole('paragraph').getByText(PRODUCT_CONSTANTS.ERROR_MESSAGES.PRICE_NEGATIVE);
-    this.stockError = page.getByRole('paragraph').getByText(PRODUCT_CONSTANTS.ERROR_MESSAGES.STOCK_REQUIRED);
-    this.stockNegativeError = page.getByRole('paragraph').getByText(PRODUCT_CONSTANTS.ERROR_MESSAGES.STOCK_NEGATIVE);
+    this.skuError = page.getByRole('paragraph').getByText('SKU is required');
+    this.nameError = page.getByRole('paragraph').getByText('Name is required');
+    this.priceError = page.getByRole('paragraph').getByText('Price is required');
+    this.priceNegativeError = page.getByRole('paragraph').getByText('Price must be greater than 0');
+    this.stockError = page.getByRole('paragraph').getByText('Stock is required');
+    this.stockNegativeError = page.getByRole('paragraph').getByText('Stock cannot be negative');
     this.navbar = page.getByTestId('navbar');
     this.navLogo = page.getByTestId('nav-logo');
     this.navDashboard = page.getByTestId('nav-dashboard');

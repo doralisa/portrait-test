@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { LoginPage } from '../../pages/login.page';
-import { LOGIN_CONSTANTS } from '../fixtures/loginConstants';
 import { loginAsAdmin, verifyCurrentUrl } from '../helpers/test-helpers';
+import testData from '../../data/test-products.json';
 
 test.describe('Login Functionality', () => {
   let loginPage: LoginPage;
@@ -12,22 +12,11 @@ test.describe('Login Functionality', () => {
   });
 
   test.describe('Valid Login Scenarios', () => {
-    const validCredentials = [
-      {
-        email: LOGIN_CONSTANTS.ADMIN_EMAIL,
-        password: LOGIN_CONSTANTS.ADMIN_PASSWORD,
-        role: 'admin'
-      },
-      {
-        email: LOGIN_CONSTANTS.REGULAR_EMAIL,
-        password: LOGIN_CONSTANTS.REGULAR_PASSWORD,
-        role: 'user'
-      }
-    ];
+    const validUsers = testData.testUsers.filter(user => user.valid);
 
-    for (const credentials of validCredentials) {
-      test(`should successfully login with ${credentials.role} credentials`, async ({ page }) => {
-        await loginPage.login(credentials.email, credentials.password);
+    for (const user of validUsers) {
+      test(`should successfully login with ${user.role} credentials`, async ({ page }) => {
+        await loginPage.login(user.email, user.password);
         await verifyCurrentUrl(page, '/dashboard');
         await expect(loginPage.dashboardTitle).toContainText('Dashboard');
       });
@@ -37,33 +26,33 @@ test.describe('Login Functionality', () => {
   test.describe('Invalid Login Scenarios', () => {
     const invalidCredentials = [
       {
-        email: LOGIN_CONSTANTS.INVALID_EMAIL,
-        password: LOGIN_CONSTANTS.ADMIN_PASSWORD,
+        email: testData.testUsers.find(u => !u.valid)?.email || 'invalid@test.com',
+        password: testData.testUsers.find(u => u.valid)?.password || 'Admin123!',
         scenario: 'wrong email'
       },
       {
-        email: LOGIN_CONSTANTS.ADMIN_EMAIL,
-        password: LOGIN_CONSTANTS.INVALID_PASSWORD,
+        email: testData.testUsers.find(u => u.valid)?.email || 'admin@test.com',
+        password: testData.testUsers.find(u => !u.valid)?.password || 'wrongpassword',
         scenario: 'wrong password'
       },
       {
-        email: LOGIN_CONSTANTS.EMPTY_EMAIL,
-        password: LOGIN_CONSTANTS.ADMIN_PASSWORD,
+        email: '',
+        password: testData.testUsers.find(u => u.valid)?.password || 'Admin123!',
         scenario: 'empty email'
       },
       {
-        email: LOGIN_CONSTANTS.ADMIN_EMAIL,
-        password: LOGIN_CONSTANTS.EMPTY_PASSWORD,
+        email: testData.testUsers.find(u => u.valid)?.email || 'admin@test.com',
+        password: '',
         scenario: 'empty password'
       },
       {
-        email: LOGIN_CONSTANTS.EMPTY_EMAIL,
-        password: LOGIN_CONSTANTS.EMPTY_PASSWORD,
+        email: '',
+        password: '',
         scenario: 'both fields empty'
       },
       {
-        email: LOGIN_CONSTANTS.WRONG_FORMAT_EMAIL,
-        password: LOGIN_CONSTANTS.ADMIN_PASSWORD,
+        email: 'invalid-email-format',
+        password: testData.testUsers.find(u => u.valid)?.password || 'Admin123!',
         scenario: 'invalid email format'
       }
     ];
@@ -75,7 +64,7 @@ test.describe('Login Functionality', () => {
         if (credentials.scenario === 'wrong email' || credentials.scenario === 'wrong password') {
           await expect(loginPage.errorMessage).toBeVisible({ timeout: 10000 });
           const errorText = await loginPage.getErrorMessage();
-          expect(errorText).toContain(LOGIN_CONSTANTS.ERROR_MESSAGE);
+          expect(errorText).toContain(testData.testUsers.find(u => !u.valid)?.expectedError || 'Invalid email or password');
         } else {
           await expect(loginPage.page).not.toHaveURL(/.*\/dashboard/);
           await expect(loginPage.page).toHaveURL(/.*\/login/);
@@ -88,12 +77,13 @@ test.describe('Login Functionality', () => {
 
   test.describe('Password Visibility Toggle', () => {
     test('should toggle password visibility', async () => {
+      const testPassword = testData.testUsers.find(u => u.valid && u.role === 'user')?.password || 'User123!';
       expect(await loginPage.isPasswordVisible()).toBe(false);
-      await loginPage.passwordInput.fill(LOGIN_CONSTANTS.REGULAR_PASSWORD);
+      await loginPage.passwordInput.fill(testPassword);
       await loginPage.togglePasswordVisibility();
       expect(await loginPage.isPasswordVisible()).toBe(true);
       const visiblePassword = await loginPage.passwordInput.inputValue();
-      expect(visiblePassword).toBe(LOGIN_CONSTANTS.REGULAR_PASSWORD);
+      expect(visiblePassword).toBe(testPassword);
       await loginPage.togglePasswordVisibility();
       expect(await loginPage.isPasswordVisible()).toBe(false);
     });
