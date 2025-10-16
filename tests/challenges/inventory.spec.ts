@@ -1,25 +1,14 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../fixtures/authenticated-fixture';
 import { InventoryPage } from '../../pages/inventory.page';
-import { ProductsPage } from '../../pages/products.page';
-import { NewProductPage } from '../../pages/new-product.page';
-import { loginAsAdmin } from '../helpers/test-helpers';
 import inventoryData from '../../data/inventory-test-data.json';
 
 test.describe('Inventory Management Tests', () => {
-  let inventoryPage: InventoryPage;
-  let productsPage: ProductsPage;
-  let newProductPage: NewProductPage;
-
-  test.beforeEach(async ({ page }) => {
-    inventoryPage = new InventoryPage(page);
-    productsPage = new ProductsPage(page);
-    newProductPage = new NewProductPage(page);
-    await loginAsAdmin(page);
-    await inventoryPage.goto();
-  });
 
   test.describe('Adjust Stock Levels', () => {
-    test('should open adjust stock modal', async () => {
+    test('should open adjust stock modal', async ({ authenticatedPage, createTestProduct }) => {
+      await createTestProduct();
+      const inventoryPage = new InventoryPage(authenticatedPage);
+      await inventoryPage.goto();
       const productCount = await inventoryPage.getProductCount();
       if (productCount > 0) {
         const id = await inventoryPage.getFirstProductId();
@@ -32,7 +21,10 @@ test.describe('Inventory Management Tests', () => {
       }
     });
 
-    test('should increase stock level successfully', async () => {
+    test('should increase stock level successfully', async ({ authenticatedPage, createTestProduct }) => {
+      await createTestProduct();
+      const inventoryPage = new InventoryPage(authenticatedPage);
+      await inventoryPage.goto();
       const productCount = await inventoryPage.getProductCount();
       if (productCount > 0) {
         const id = await inventoryPage.getFirstProductId();
@@ -44,7 +36,10 @@ test.describe('Inventory Management Tests', () => {
       }
     });
 
-    test('should decrease stock level successfully', async () => {
+    test('should decrease stock level successfully', async ({ authenticatedPage, createTestProduct }) => {
+      await createTestProduct();
+      const inventoryPage = new InventoryPage(authenticatedPage);
+      await inventoryPage.goto();
       const productCount = await inventoryPage.getProductCount();
       if (productCount > 0) {
         const id = await inventoryPage.getFirstProductId();
@@ -58,7 +53,10 @@ test.describe('Inventory Management Tests', () => {
   });
 
   test.describe('Stock Validation', () => {
-    test('should show error for invalid adjustment input', async () => {
+    test('should show error for invalid adjustment input', async ({ authenticatedPage, createTestProduct }) => {
+      await createTestProduct();
+      const inventoryPage = new InventoryPage(authenticatedPage);
+      await inventoryPage.goto();
       const productCount = await inventoryPage.getProductCount();
       if (productCount > 0) {
         const id = await inventoryPage.getFirstProductId();
@@ -72,7 +70,10 @@ test.describe('Inventory Management Tests', () => {
       }
     });
 
-    test('should prevent stock from going below zero', async () => {
+    test('should prevent stock from going below zero', async ({ authenticatedPage, createTestProduct }) => {
+      await createTestProduct();
+      const inventoryPage = new InventoryPage(authenticatedPage);
+      await inventoryPage.goto();
       const productCount = await inventoryPage.getProductCount();
       if (productCount > 0) {
         const id = await inventoryPage.getFirstProductId();
@@ -88,7 +89,10 @@ test.describe('Inventory Management Tests', () => {
   });
 
   test.describe('Low Stock Alerts', () => {
-    test('should display low stock badge when product stock is low', async () => {
+    test('should display low stock badge when product stock is low', async ({ authenticatedPage, createTestProduct }) => {
+      await createTestProduct();
+      const inventoryPage = new InventoryPage(authenticatedPage);
+      await inventoryPage.goto();
       const productCount = await inventoryPage.getProductCount();
       if (productCount > 0) {
         const id = await inventoryPage.getFirstProductId();
@@ -102,7 +106,10 @@ test.describe('Inventory Management Tests', () => {
       }
     });
 
-    test('should show accurate low stock alert count', async () => {
+    test('should show accurate low stock alert count', async ({ authenticatedPage, createTestProduct }) => {
+      await createTestProduct();
+      const inventoryPage = new InventoryPage(authenticatedPage);
+      await inventoryPage.goto();
       try {
         await expect(inventoryPage.lowStockAlert).toBeVisible({ timeout: 1000 });
         const result = await inventoryPage.verifyLowStockAlertAccuracy();

@@ -1,22 +1,11 @@
-import { test, expect } from '@playwright/test';
-import { ProductsPage } from '../../pages/products.page';
-import { NewProductPage } from '../../pages/new-product.page';
-import { loginAsAdmin } from '../helpers/test-helpers';
+import { test, expect } from '../fixtures/authenticated-fixture';
 import testData from '../../data/test-products.json';
 
 test.describe('Product Management Tests', () => {
-  let productsPage: ProductsPage;
-  let newProductPage: NewProductPage;
 
-  test.beforeEach(async ({ page }) => {
-    productsPage = new ProductsPage(page);
-    newProductPage = new NewProductPage(page);
-    await loginAsAdmin(page);
-    await productsPage.goto();
-  });
-
-  test('should add a new product with valid data', async () => {
+  test('should add a new product with valid data', async ({ productsPage, newProductPage }) => {
     const validProduct = testData.validProducts[0];
+    await productsPage.goto();
     await productsPage.clickAddProduct();
     await newProductPage.createProduct({
       sku: validProduct.sku,
@@ -32,7 +21,8 @@ test.describe('Product Management Tests', () => {
   });
 
   test.describe('Form Validation', () => {
-    test('should validate required fields', async () => {
+    test('should validate required fields', async ({ productsPage, newProductPage }) => {
+      await productsPage.goto();
       await productsPage.clickAddProduct();
       await newProductPage.saveButton.click();
       await expect(newProductPage.skuError).toContainText('SKU is required');
@@ -41,7 +31,8 @@ test.describe('Product Management Tests', () => {
       await expect(newProductPage.stockError).toContainText('Stock is required');
     });
 
-    test('should show validation error for negative price', async () => {
+    test('should show validation error for negative price', async ({ productsPage, newProductPage }) => {
+      await productsPage.goto();
       await productsPage.clickAddProduct();
       const invalidProduct = testData.invalidProducts.find(p => p.expectedError === 'Price must be greater than 0');
       await newProductPage.fillForm({
@@ -57,7 +48,8 @@ test.describe('Product Management Tests', () => {
       await expect(newProductPage.priceNegativeError).toContainText(invalidProduct?.expectedError || 'Price must be greater than 0');
     });
 
-    test('should show validation error for negative stock', async () => {
+    test('should show validation error for negative stock', async ({ productsPage, newProductPage }) => {
+      await productsPage.goto();
       await productsPage.clickAddProduct();
       const invalidProduct = testData.invalidProducts.find(p => p.expectedError === 'Stock cannot be negative');
       await newProductPage.fillForm({
@@ -75,8 +67,9 @@ test.describe('Product Management Tests', () => {
   });
 
   test.describe('Search Products', () => {
-    test('should search for products by name', async () => {
+    test('should search for products by name', async ({ productsPage, newProductPage }) => {
       const validProduct = testData.validProducts[0];
+      await productsPage.goto();
       await productsPage.clickAddProduct();
       await newProductPage.createProduct({
         sku: validProduct.sku,
@@ -93,7 +86,8 @@ test.describe('Product Management Tests', () => {
       expect(await productsPage.isProductInTable(validProduct.name)).toBe(true);
     });
 
-    test('should show no results message when no products match', async () => {
+    test('should show no results message when no products match', async ({ productsPage }) => {
+      await productsPage.goto();
       await productsPage.searchInput.fill('NonExistentProduct');
       await expect(productsPage.noProductsMessage).toBeVisible();
       await expect(productsPage.noProductsMessage).toContainText('No products found');
@@ -101,8 +95,9 @@ test.describe('Product Management Tests', () => {
   });
 
   test.describe('Delete Product', () => {
-    test('should delete a product with confirmation', async () => {
+    test('should delete a product with confirmation', async ({ productsPage, newProductPage }) => {
       const validProduct = testData.validProducts[0];
+      await productsPage.goto();
       await productsPage.clickAddProduct();
       await newProductPage.createProduct({
         sku: validProduct.sku,
