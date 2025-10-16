@@ -61,7 +61,7 @@ class CustomReporter implements Reporter {
         .filter(r => r.status === 'failed')
         .forEach((result, index) => {
           const test = result.test;
-          console.log(`   ${index + 1}. ${test.title}`);
+          console.log(`   ${index + 1}. ${test?.title || 'Unknown Test'}`);
           if (result.error) {
             console.log(`      Error: ${result.error.message}`);
           }

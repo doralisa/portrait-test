@@ -37,7 +37,7 @@ jobs:
         timeout 60 bash -c 'until curl -f http://localhost:3456/login; do sleep 3; done'
     
     - name: Run all Playwright tests
-      run: npx playwright test --project=chromium
+      run: npx playwright test --project=chromium --update-snapshots
       env:
         CI: true
     
@@ -55,4 +55,12 @@ jobs:
       with:
         name: custom-reports
         path: test-results/
+        retention-days: 30
+    
+    - name: Upload visual regression snapshots
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: visual-regression-snapshots
+        path: tests/challenges/visual-regression.spec.ts-snapshots/
         retention-days: 30
