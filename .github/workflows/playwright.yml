@@ -1,10 +1,11 @@
-name: Playwright Tests
+# DISABLED - Using simple-tests.yml instead
+# name: Playwright Tests
 
-on:
-  push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main ]
+# on:
+#   push:
+#     branches: [ main, develop ]
+#   pull_request:
+#     branches: [ main ]
 
 jobs:
   test:
@@ -29,8 +30,16 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
     
-    - name: Build application
-      run: npm run build
+    - name: Start application
+      run: |
+        npm run dev &
+        sleep 10
+      env:
+        PORT: 3456
+    
+    - name: Wait for application to be ready
+      run: |
+        timeout 60 bash -c 'until curl -f http://localhost:3456/login; do sleep 2; done'
     
     - name: Run Playwright tests
       run: npx playwright test

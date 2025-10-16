@@ -1,10 +1,11 @@
-name: Parallel Test Execution
+# DISABLED - Using simple-tests.yml instead
+# name: Parallel Test Execution
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+# on:
+#   push:
+#     branches: [ main ]
+#   pull_request:
+#     branches: [ main ]
 
 jobs:
   test-matrix:
@@ -38,8 +39,16 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps chromium
     
-    - name: Build application
-      run: npm run build
+    - name: Start application
+      run: |
+        npm run dev &
+        sleep 10
+      env:
+        PORT: 3456
+    
+    - name: Wait for application to be ready
+      run: |
+        timeout 60 bash -c 'until curl -f http://localhost:3456/login; do sleep 2; done'
     
     - name: Run ${{ matrix.test-suite }} tests
       run: |
