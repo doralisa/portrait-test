@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test'
 
 export default defineConfig({
-  testDir: './tests',
+  testDir: './tests/challenges',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
@@ -36,9 +36,10 @@ export default defineConfig({
     },
   ],
 
-  webServer: {
-    command: 'PORT=3456 npm run dev',
-    url: 'http://localhost:3456',
-    reuseExistingServer: !process.env.CI,
-  },
+  // webServer disabled - handled by GitHub Actions workflow
+  // webServer: {
+  //   command: 'PORT=3456 npm run dev',
+  //   url: 'http://localhost:3456',
+  //   reuseExistingServer: !process.env.CI,
+  // },
 })

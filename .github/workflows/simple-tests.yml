@@ -37,7 +37,7 @@ jobs:
         timeout 60 bash -c 'until curl -f http://localhost:3456/login; do sleep 3; done'
     
     - name: Run all Playwright tests
-      run: npx playwright test tests/challenges/ --project=chromium
+      run: npx playwright test --project=chromium
       env:
         CI: true
     
