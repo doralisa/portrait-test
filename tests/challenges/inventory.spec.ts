@@ -3,7 +3,7 @@ import { InventoryPage } from '../../pages/inventory.page';
 import { ProductsPage } from '../../pages/products.page';
 import { NewProductPage } from '../../pages/new-product.page';
 import { loginAsAdmin } from '../helpers/test-helpers';
-import { INVENTORY_CONSTANTS } from '../fixtures/inventoryConstants';
+import inventoryData from '../../data/inventory-test-data.json';
 
 test.describe('Inventory Management Tests', () => {
   let inventoryPage: InventoryPage;
@@ -36,7 +36,7 @@ test.describe('Inventory Management Tests', () => {
       const productCount = await inventoryPage.getProductCount();
       if (productCount > 0) {
         const id = await inventoryPage.getFirstProductId();
-        const result = await inventoryPage.adjustStockAndVerify(id, INVENTORY_CONSTANTS.ADJUSTMENT_VALUES.INCREASE);
+            const result = await inventoryPage.adjustStockAndVerify(id, inventoryData.adjustmentValues.increase);
         
         expect(result.displayedNewStock).toBe(result.expectedNewStock);
         expect(result.finalStock).toBe(result.expectedNewStock);
@@ -48,7 +48,7 @@ test.describe('Inventory Management Tests', () => {
       const productCount = await inventoryPage.getProductCount();
       if (productCount > 0) {
         const id = await inventoryPage.getFirstProductId();
-        const result = await inventoryPage.adjustStockAndVerify(id, INVENTORY_CONSTANTS.ADJUSTMENT_VALUES.DECREASE);
+            const result = await inventoryPage.adjustStockAndVerify(id, inventoryData.adjustmentValues.decrease);
         
         expect(result.displayedNewStock).toBe(result.expectedNewStock);
         expect(result.finalStock).toBe(result.expectedNewStock);
@@ -64,11 +64,11 @@ test.describe('Inventory Management Tests', () => {
         const id = await inventoryPage.getFirstProductId();
         
         await inventoryPage.clickAdjustStock(id);
-        await inventoryPage.adjustmentInput.fill(INVENTORY_CONSTANTS.ADJUSTMENT_VALUES.INVALID);
-        await inventoryPage.confirmAdjustment();
+        await inventoryPage.adjustmentInput.pressSequentially(inventoryData.adjustmentValues.invalid);
+        await inventoryPage.confirmAdjustmentButton.click();
         
         await expect(inventoryPage.adjustmentError).toBeVisible();
-        await expect(inventoryPage.adjustmentError).toContainText(INVENTORY_CONSTANTS.ERROR_MESSAGES.INVALID_ADJUSTMENT);
+        await expect(inventoryPage.adjustmentError).toContainText(inventoryData.errorMessages.invalidAdjustment);
       }
     });
 
@@ -80,7 +80,7 @@ test.describe('Inventory Management Tests', () => {
         
         if (result.canProceed) {
           await expect(inventoryPage.adjustmentError).toBeVisible();
-          await expect(inventoryPage.adjustmentError).toContainText(INVENTORY_CONSTANTS.ERROR_MESSAGES.STOCK_NEGATIVE);
+              await expect(inventoryPage.adjustmentError).toContainText(inventoryData.errorMessages.stockNegative);
           await expect(inventoryPage.adjustModal).toBeVisible();
         }
       }
@@ -97,7 +97,7 @@ test.describe('Inventory Management Tests', () => {
         if (result.canProceed) {
           await inventoryPage.waitForLowStockBadge(id);
           const lowStockBadge = await inventoryPage.getLowStockBadge(id);
-          await expect(lowStockBadge).toContainText(INVENTORY_CONSTANTS.STATUS.LOW_STOCK);
+          await expect(lowStockBadge).toContainText(inventoryData.status.lowStock);
         }
       }
     });

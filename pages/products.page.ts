@@ -82,14 +82,6 @@ export class ProductsPage {
     await this.page.getByTestId(`delete-product-${productId}`).click();
   }
 
-  async confirmDelete() {
-    await waitForElement(this.page, 'confirm-delete-button');
-    await this.confirmDeleteButton.click();
-  }
-
-  async cancelDelete() {
-    await this.cancelDeleteButton.click();
-  }
 
   async waitForDeleteModal() {
     await this.deleteModal.waitFor({ state: 'visible' });

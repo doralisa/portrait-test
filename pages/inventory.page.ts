@@ -13,6 +13,7 @@ export class InventoryPage {
   readonly confirmAdjustmentButton: Locator;
   readonly cancelAdjustmentButton: Locator;
   readonly adjustmentError: Locator;
+  readonly newStockValue: Locator;
   readonly navbar: Locator;
   readonly navLogo: Locator;
   readonly navDashboard: Locator;
@@ -33,6 +34,7 @@ export class InventoryPage {
     this.confirmAdjustmentButton = page.getByTestId('confirm-adjust-button');
     this.cancelAdjustmentButton = page.getByTestId('cancel-adjust-button');
     this.adjustmentError = page.getByTestId('adjustment-error');
+    this.newStockValue = page.locator('p:has-text("New Stock:") strong');
     this.navbar = page.getByTestId('navbar');
     this.navLogo = page.getByTestId('nav-logo');
     this.navDashboard = page.getByTestId('nav-dashboard');
@@ -59,22 +61,10 @@ export class InventoryPage {
     await this.page.getByTestId(`adjust-stock-${productId}`).click();
   }
 
-  async fillAdjustment(amount: string) {
-    await this.adjustmentInput.fill(amount);
-  }
-
-  async confirmAdjustment() {
-    await this.confirmAdjustmentButton.click();
-  }
-
-  async cancelAdjustment() {
-    await this.cancelAdjustmentButton.click();
-  }
 
   async getAdjustmentError() {
     return await this.adjustmentError.textContent();
   }
-
 
   async getLowStockCount() {
     const alertText = await this.lowStockAlert.textContent();
@@ -123,9 +113,8 @@ export class InventoryPage {
   }
 
   async getNewStockValue() {
-    const newStockText = await this.page.locator('text=New Stock:').locator('..').textContent();
-    const match = newStockText?.match(/New Stock:\s*<strong>(\d+)<\/strong>/);
-    return match ? parseInt(match[1]) : 0;
+    const text = await this.newStockValue.textContent();
+    return text ? parseInt(text) : 0;
   }
 
   async adjustStockAndVerify(productId: string, adjustment: string) {
@@ -133,12 +122,12 @@ export class InventoryPage {
     const initialStockValue = parseInt(initialStock || '0');
     
     await this.clickAdjustStock(productId);
-    await this.fillAdjustment(adjustment);
+    await this.adjustmentInput.fill(adjustment);
     
     const expectedNewStock = initialStockValue + parseInt(adjustment);
     const displayedNewStock = await this.getNewStockValue();
     
-    await this.confirmAdjustment();
+    await this.confirmAdjustmentButton.click();
     await this.adjustModal.waitFor({ state: 'hidden' });
     
     const finalStock = await this.getProductStock(productId);
@@ -158,8 +147,8 @@ export class InventoryPage {
     
     if (initialStockValue > 0) {
       await this.clickAdjustStock(productId);
-      await this.fillAdjustment(`-${initialStockValue + 10}`);
-      await this.confirmAdjustment();
+      await this.adjustmentInput.fill(`-${initialStockValue + 10}`);
+      await this.confirmAdjustmentButton.click();
       
       return {
         initialStock: initialStockValue,
@@ -182,8 +171,8 @@ export class InventoryPage {
     if (initialStockValue > 1) {
       const adjustment = -(initialStockValue - 1);
       await this.clickAdjustStock(productId);
-      await this.fillAdjustment(adjustment.toString());
-      await this.confirmAdjustment();
+      await this.adjustmentInput.fill(adjustment.toString());
+      await this.confirmAdjustmentButton.click();
       await this.adjustModal.waitFor({ state: 'hidden' });
       
       return {

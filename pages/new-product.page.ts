@@ -80,15 +80,6 @@ export class NewProductPage {
     if (data.lowStockThreshold) await this.thresholdInput.fill(data.lowStockThreshold);
   }
 
-  async submitForm() {
-    await waitForElement(this.page, 'save-button');
-    await this.saveButton.click();
-  }
-
-  async cancelForm() {
-    await waitForElement(this.page, 'cancel-button');
-    await this.cancelButton.click();
-  }
 
 
   async getValidationErrors() {
@@ -141,6 +132,6 @@ export class NewProductPage {
 
   async createProduct(productData: ProductFormData) {
     await this.fillForm(productData);
-    await this.submitForm();
+    await this.saveButton.click();
   }
 }

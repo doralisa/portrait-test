@@ -34,7 +34,7 @@ test.describe('Product Management Tests', () => {
   test.describe('Form Validation', () => {
     test('should validate required fields', async () => {
       await productsPage.clickAddProduct();
-      await newProductPage.submitForm();
+      await newProductPage.saveButton.click();
       await expect(newProductPage.skuError).toContainText('SKU is required');
       await expect(newProductPage.nameError).toContainText('Name is required');
       await expect(newProductPage.priceError).toContainText('Price is required');
@@ -53,7 +53,7 @@ test.describe('Product Management Tests', () => {
         category: 'Electronics',
         lowStockThreshold: '10'
       });
-      await newProductPage.submitForm();
+      await newProductPage.saveButton.click();
       await expect(newProductPage.priceNegativeError).toContainText(invalidProduct?.expectedError || 'Price must be greater than 0');
     });
 
@@ -69,7 +69,7 @@ test.describe('Product Management Tests', () => {
         category: 'Electronics',
         lowStockThreshold: '10'
       });
-      await newProductPage.submitForm();
+      await newProductPage.saveButton.click();
       await expect(newProductPage.stockNegativeError).toContainText(invalidProduct?.expectedError || 'Stock cannot be negative');
     });
   });
@@ -117,7 +117,7 @@ test.describe('Product Management Tests', () => {
       if (await productsPage.isProductInTable(validProduct.name)) {
         await productsPage.deleteFirstProduct();
         await expect(productsPage.deleteModal).toBeVisible();
-        await productsPage.confirmDelete();
+        await productsPage.confirmDeleteButton.click();
         await expect(productsPage.deleteModal).not.toBeVisible();
         await productsPage.searchInput.fill(validProduct.name);
         await expect(productsPage.noProductsMessage).toBeVisible();
