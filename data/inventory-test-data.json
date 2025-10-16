@@ -1,0 +1,17 @@
+{
+  "titles": {
+    "pageTitle": "Inventory Management"
+  },
+  "adjustmentValues": {
+    "increase": "5",
+    "decrease": "-3",
+    "invalid": "e"
+  },
+  "status": {
+    "lowStock": "Low Stock"
+  },
+  "errorMessages": {
+    "invalidAdjustment": "Please enter a valid number",
+    "stockNegative": "Stock cannot be negative"
+  }
+}

@@ -1,0 +1,126 @@
+# DISABLED - Using simple-tests.yml instead
+# name: Parallel Test Execution
+
+# on:
+#   push:
+#     branches: [ main ]
+#   pull_request:
+#     branches: [ main ]
+
+jobs:
+  test-matrix:
+    timeout-minutes: 45
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        test-suite: [
+          'login',
+          'product-management', 
+          'inventory',
+          'api-integration',
+          'visual-regression',
+          'performance-metrics',
+          'e2e-user-journeys'
+        ]
+        node-version: [18]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps chromium
+    
+    - name: Start application
+      run: |
+        npm run dev &
+        sleep 10
+      env:
+        PORT: 3456
+    
+    - name: Wait for application to be ready
+      run: |
+        timeout 60 bash -c 'until curl -f http://localhost:3456/login; do sleep 2; done'
+    
+    - name: Run ${{ matrix.test-suite }} tests
+      run: |
+        case "${{ matrix.test-suite }}" in
+          "login")
+            npx playwright test tests/challenges/login.spec.ts --project=chromium
+            ;;
+          "product-management")
+            npx playwright test tests/challenges/product-management.spec.ts --project=chromium
+            ;;
+          "inventory")
+            npx playwright test tests/challenges/inventory.spec.ts --project=chromium
+            ;;
+          "api-integration")
+            npx playwright test tests/challenges/api-integration.spec.ts --project=chromium
+            ;;
+          "visual-regression")
+            npx playwright test tests/challenges/visual-regression.spec.ts --project=chromium
+            ;;
+          "performance-metrics")
+            npx playwright test tests/challenges/performance-metrics.spec.ts --project=chromium
+            ;;
+          "e2e-user-journeys")
+            npx playwright test tests/challenges/e2e-user-journeys.spec.ts --project=chromium
+            ;;
+        esac
+      env:
+        CI: true
+    
+    - name: Upload ${{ matrix.test-suite }} results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: ${{ matrix.test-suite }}-results
+        path: test-results/
+        retention-days: 30
+
+  test-summary:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    needs: test-matrix
+    if: always()
+    
+    steps:
+    - name: Download all test results
+      uses: actions/download-artifact@v4
+      with:
+        path: all-results/
+    
+    - name: Generate test summary
+      run: |
+        echo "# Test Execution Summary" > test-summary.md
+        echo "" >> test-summary.md
+        echo "## Test Suites Executed" >> test-summary.md
+        echo "" >> test-summary.md
+        
+        for suite in login product-management inventory api-integration visual-regression performance-metrics e2e-user-journeys; do
+          if [ -d "all-results/$suite-results" ]; then
+            echo "✅ $suite - Completed" >> test-summary.md
+          else
+            echo "❌ $suite - Failed" >> test-summary.md
+          fi
+        done
+        
+        echo "" >> test-summary.md
+        echo "## Artifacts Generated" >> test-summary.md
+        echo "" >> test-summary.md
+        ls -la all-results/ >> test-summary.md
+    
+    - name: Upload test summary
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-execution-summary
+        path: test-summary.md
+        retention-days: 30

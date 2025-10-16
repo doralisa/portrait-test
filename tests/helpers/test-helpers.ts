@@ -64,3 +64,11 @@ export function generateTestProduct() {
     lowStockThreshold: 10
   }
 }
+
+/**
+ * Verify current URL matches expected URL
+ */
+export async function verifyCurrentUrl(page: Page, expectedUrl: string) {
+  const currentUrl = page.url();
+  return currentUrl.includes(expectedUrl);
+}
